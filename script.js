@@ -58,6 +58,7 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 
 ///////////////////////////////////////
 // Menu Fade Animation
+
 const nav = document.querySelector('.nav');
 const navLogo = nav.querySelector('.nav__logo');
 
@@ -74,19 +75,31 @@ const changeOpacity = function (e) {
   }
 };
 
-// Sticky Navbar
-window.addEventListener('scroll', function () {
-  if (section1.getBoundingClientRect().top <= 0) {
-    nav.classList.add('sticky');
-  } else {
-    nav.classList.remove('sticky');
-  }
-});
-
 // Passing argument into `this`
 nav.addEventListener('mouseover', changeOpacity.bind(0.5));
-
 nav.addEventListener('mouseout', changeOpacity.bind(1));
+
+///////////////////////////////////////
+// Sticky Navbar
+
+const header = document.querySelector('.header');
+const navHeight = nav.getBoundingClientRect().height;
+const obsCallback = function (entries) {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) {
+      nav.classList.add('sticky');
+    } else {
+      nav.classList.remove('sticky');
+    }
+  });
+};
+
+const observer = new IntersectionObserver(obsCallback, {
+  root: null,
+  rootMargin: `-${navHeight}px`,
+  threshold: 0,
+});
+observer.observe(header);
 
 ///////////////////////////////////////
 // Tabbed Component
@@ -109,4 +122,31 @@ tabsContainer.addEventListener('click', function (e) {
   document
     .querySelector(`.operations__content--${num}`)
     .classList.add('operations__content--active');
+});
+
+///////////////////////////////////////
+// Reveal Section
+const sections = document.querySelectorAll('.section');
+
+const revealSection = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) {
+    entry.target.classList.add('section--hidden');
+  }
+
+  if (entry.isIntersecting) {
+    console.log(entry.target);
+    entry.target.classList.remove('section--hidden');
+  }
+};
+
+const secObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+
+sections.forEach(section => {
+  section.classList.add('section--hidden');
+  secObserver.observe(section);
 });
